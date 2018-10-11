@@ -39,7 +39,7 @@ Download dtb(device tree):
 ./nuwriter -m sdram -d NUC972DF62Y.ini -a 0x8000 -w $IMAGE_PATH/970image -n -i 0x1E00000
 ```
 
-Download & run u-boot or your [bare metal application](https://github.com/OpenNuvoton/NUC970_NonOS_BSP) via SDRAM (without SD/SPI/NAND boot media):
+Download & run u-boot via SDRAM (without SD/SPI/NAND boot media):
 ```
 sudo ./nuwriter -m sdram -d NUC976DK62Y.ini -a 0xE00000 -w $IMAGE_PATH/u-boot.bin -n
 ```
