@@ -412,10 +412,14 @@ int UXmodem_NAND(void)
 					char* ptr=(char *)(lpBuffer+4);
 					while (1) {
 						if (fgets(line,256, fp) == NULL) break;
-						if(line[strlen(line)-2]==0x0D || line[strlen(line)-1]==0x0A) {
+						if(line[strlen(line)-2]==0x0D && line[strlen(line)-1]==0x0A) {
 							strncpy(ptr,line,strlen(line)-1);
 							ptr[strlen(line)-2]=0x0;
 							ptr+=(strlen(line)-1);
+						}else if(line[strlen(line)-1]==0x0A) {
+							strncpy(ptr,line,strlen(line));
+							ptr[strlen(line)-1]=0x0;
+							ptr+=(strlen(line));
 						} else {
 							strncpy(ptr,line,strlen(line));
 							ptr+=(strlen(line));
@@ -744,10 +748,14 @@ int UXmodem_SPI(void)
 					char* ptr=(char *)(lpBuffer+4);
 					while (1) {
 						if (fgets(line,256, fp) == NULL) break;
-						if(line[strlen(line)-2]==0x0D || line[strlen(line)-1]==0x0A) {
+						if(line[strlen(line)-2]==0x0D && line[strlen(line)-1]==0x0A) {
 							strncpy(ptr,line,strlen(line)-1);
 							ptr[strlen(line)-2]=0x0;
 							ptr+=(strlen(line)-1);
+						}else if(line[strlen(line)-1]==0x0A) {
+							strncpy(ptr,line,strlen(line));
+							ptr[strlen(line)-1]=0x0;
+							ptr+=(strlen(line));
 						} else {
 							strncpy(ptr,line,strlen(line));
 							ptr+=(strlen(line));
@@ -1083,10 +1091,14 @@ int UXmodem_EMMC(void)
 					char* ptr=(char *)(lpBuffer+4);
 					while (1) {
 						if (fgets(line,256, fp) == NULL) break;
-						if(line[strlen(line)-2]==0x0D || line[strlen(line)-1]==0x0A) {
+						if(line[strlen(line)-2]==0x0D && line[strlen(line)-1]==0x0A) {
 							strncpy(ptr,line,strlen(line)-1);
 							ptr[strlen(line)-2]=0x0;
 							ptr+=(strlen(line)-1);
+						}else if(line[strlen(line)-1]==0x0A) {
+							strncpy(ptr,line,strlen(line));
+							ptr[strlen(line)-1]=0x0;
+							ptr+=(strlen(line));
 						} else {
 							strncpy(ptr,line,strlen(line));
 							ptr+=(strlen(line));
