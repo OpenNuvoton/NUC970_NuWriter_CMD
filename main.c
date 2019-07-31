@@ -82,6 +82,7 @@ int main(int argc, char **argv)
 	int cmd_opt = 0;
 	memcpy(Data_Path,argv[0],strlen(argv[0]));
 	path=strrchr(Data_Path,'/');
+	csg_usb_index=1;
 	if(path==NULL) {
 #ifndef _WIN32
 		Data_Path[0]='.';
@@ -101,8 +102,7 @@ int main(int argc, char **argv)
 	//fprintf(stderr, "argc:%d\n", argc);
 	while(1) {
 		//fprintf(stderr, "proces index:%d\n", optind);
-		cmd_opt = getopt(argc, argv, "a:d:e:i:nvhw:r:t:m:z::");
-
+		cmd_opt = getopt(argc, argv, "a:d:e:i:nvhw:r:t:m:z::c::");
 		/* End condition always first */
 		if (cmd_opt == -1) {
 			break;
@@ -236,7 +236,9 @@ int main(int argc, char **argv)
 			print_using();
 			return 0;
 			break;
-
+         case 'c':
+			csg_usb_index = atoi(argv[optind]);
+			break;
 
 		/* Error handle: Mainly missing arg or illegal option */
 		case '?':

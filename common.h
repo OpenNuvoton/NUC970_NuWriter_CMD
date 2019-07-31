@@ -103,4 +103,6 @@ struct _INFO_T m_info;
 libusb_context *ctx;
 libusb_device_handle *handle;
 
+unsigned int csg_usb_index;
+
 #endif

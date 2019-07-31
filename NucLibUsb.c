@@ -86,16 +86,65 @@ int NUC_WritePipe(int id,unsigned char *buf,int len)
 	}
 	return 0;
 }
+libusb_device_handle * libusb_open_device_with_vid_pid_index( libusb_context *ctx,
+                                                              unsigned int vendor_id,
+                                                              unsigned int product_id,
+                                                              int index
+)
+{
+	libusb_device **devs;
+	ssize_t cnt;
+	libusb_device *dev;
+	int i=0,j=0,count=0;
+	libusb_device_handle *dev_handle;
+	
+	cnt = libusb_get_device_list(NULL,&devs);
+	if(cnt < 0)
+	{
+        return NULL;
+	}
+	while((dev = devs[i++]) != NULL)
+	{
+	    struct libusb_device_descriptor desc;
+	    
+	    int r = libusb_get_device_descriptor(dev,&desc);
+	    if(r < 0)
+	    {
+            fprintf(stderr,"failed to get device descriptor\r\n");
+		    return NULL;
+	    }
+	    if((desc.idVendor == vendor_id)&&(desc.idProduct == product_id))
+	    {
+		    count++;
+		    if(count == index)
+		    {
+                r = libusb_open(dev,&dev_handle);
+		        if(r <  0 )
+	            {
+			        printf("r = %d\r\n",r);
+	                return NULL;
+		        }
+		        else
+		        {
+			        return dev_handle;
+		        }
+		    }
+	    }
+	}
+	return NULL;
+}
 
 int NUC_OpenUsb(void)
 {
 	int ret=0;
 	//libusb_device_handle * handle2=NULL;
+	int index = csg_usb_index;
 
 	if(handle!=NULL) return 0;
 	//Open Device with VendorID and ProductID
-	handle = libusb_open_device_with_vid_pid(ctx,
-	         USB_VENDOR_ID, USB_PRODUCT_ID);
+
+	handle = libusb_open_device_with_vid_pid_index(ctx,
+	         USB_VENDOR_ID, USB_PRODUCT_ID,index);
 	if (!handle) {
 		perror("device not found");
 		ret=-1;
