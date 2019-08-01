@@ -206,7 +206,6 @@ int main(int argc, char **argv)
 			} else {
 				fprintf(stderr,"Unknown mode\n");
 			}
-
 			break;
 
 		case 't':
@@ -225,7 +224,6 @@ int main(int argc, char **argv)
 			} else {
 				fprintf(stderr,"Unknown type\n");
 			}
-
 			break;
 		case 'e':
 			erase_tag = 1;
@@ -236,7 +234,8 @@ int main(int argc, char **argv)
 			print_using();
 			return 0;
 			break;
-         case 'c':
+                case 'c':
+
 			csg_usb_index = atoi(argv[optind]);
 			break;
 
@@ -250,8 +249,7 @@ int main(int argc, char **argv)
 			break;
 		}
 	}
-
-
+        
 	if(strlen(DDR_fileName)==0) {
 		fprintf(stderr, "Not setting DDR file\n");
 		return -1;
