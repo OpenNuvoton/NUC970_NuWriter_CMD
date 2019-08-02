@@ -118,6 +118,7 @@ int main(int argc, char **argv)
 
 			fprintf(stderr, "NuWriter [Options] [File/Value]\n\n");
 			fprintf(stderr, "-d [File]      Set DDR initial file\n");
+			fprintf(stderr, "-c [id]        Set device number,default 1\n");
 #ifndef _WIN32
 			fprintf(stderr, "-d show        Print supported DDR model\n");
 #endif
@@ -234,7 +235,7 @@ int main(int argc, char **argv)
 			print_using();
 			return 0;
 			break;
-                case 'c':
+		case 'c':
 
 			csg_usb_index = atoi(argv[optind]);
 			break;
@@ -249,7 +250,7 @@ int main(int argc, char **argv)
 			break;
 		}
 	}
-        
+
 	if(strlen(DDR_fileName)==0) {
 		fprintf(stderr, "Not setting DDR file\n");
 		return -1;
@@ -312,6 +313,11 @@ int main(int argc, char **argv)
 	}
 
 	libusb_init(NULL);
+	if((dev_count=get_device_num_with_vid_pid(ctx,USB_VENDOR_ID, USB_PRODUCT_ID))==0) {
+		libusb_exit(NULL);
+		return -1;
+	}
+
 	if(ParseFlashType()< 0) {
 		printf("Failed\n");
 		NUC_CloseUsb();

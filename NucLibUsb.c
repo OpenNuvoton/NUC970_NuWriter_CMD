@@ -89,149 +89,138 @@ int NUC_WritePipe(int id,unsigned char *buf,int len)
 
 int compare_port_path(uint8_t *port_numbers1,int port_numbers_len1,uint8_t *port_numbers2,int port_numbers_len2)
 {
-    int iRet;
+	int iRet;
 	int i;
 
-	if(port_numbers_len1 != port_numbers_len2)
-    {
-        iRet = port_numbers_len1-port_numbers_len1;
-    }
+	if(port_numbers_len1 != port_numbers_len2) {
+		iRet = port_numbers_len1-port_numbers_len1;
+	}
 
-	for(i=0;i< port_numbers_len1;i++)
-	{
-	    if(port_numbers1[i] != port_numbers2[i])
-	    {
-	        iRet = port_numbers1[i] - port_numbers2[i];
-	        break;
-	    }
+	for(i=0; i< port_numbers_len1; i++) {
+		if(port_numbers1[i] != port_numbers2[i]) {
+			iRet = port_numbers1[i] - port_numbers2[i];
+			break;
+		}
 	}
 
 	return iRet;
-	
+
 }
 
 void sort_dev_array(libusb_device **dev_arr,int count)
 {
-    int i,j;
+	int i,j;
 	libusb_device *tmp;
 	uint8_t port_numbers1[8];
 	uint8_t port_numbers2[8];
 	int port_numbers_len1;
 	int port_numbers_len2;
-	for(int i=0;i<count-1;i++)
-	{
-	    for(j=count -1;j>i;j--)
-	    {
-	        port_numbers_len1 = libusb_get_port_numbers(dev_arr[j-1],port_numbers1,sizeof(port_numbers1));
+	for(int i=0; i<count-1; i++) {
+		for(j=count -1; j>i; j--) {
+			port_numbers_len1 = libusb_get_port_numbers(dev_arr[j-1],port_numbers1,sizeof(port_numbers1));
 			port_numbers_len2 = libusb_get_port_numbers(dev_arr[j],port_numbers2,sizeof(port_numbers2));
-	        if(compare_port_path(port_numbers1,port_numbers_len1,port_numbers2,port_numbers_len2) > 0 )
-	        {
-	            tmp = dev_arr[j-1];
+			if(compare_port_path(port_numbers1,port_numbers_len1,port_numbers2,port_numbers_len2) > 0 ) {
+				tmp = dev_arr[j-1];
 				dev_arr[j-1] = dev_arr[j];
 				dev_arr[j] = tmp;
-	        }      
-	    }
+			}
+		}
 	}
-    
+
 }
 
 void print_port_numbers(libusb_device *dev)
 {
-    uint8_t port_numbers[8];
+	uint8_t port_numbers[8];
 	int port_numbers_len;
 	int i;
 	port_numbers_len = libusb_get_port_numbers(dev,port_numbers,sizeof(port_numbers));
-	if(port_numbers_len > 0)
-	{
-	    printf(" %d", port_numbers[0]);
+	if(port_numbers_len > 0) {
+		printf(" %d", port_numbers[0]);
 		for (i = 1; i <port_numbers_len; i++)
-		printf(".%d", port_numbers[i]);
+			printf(".%d", port_numbers[i]);
 	}
 }
 
-libusb_device_handle * libusb_open_device_with_vid_pid_index
-(
-libusb_context *ctx,
-unsigned int vendor_id,
-unsigned int product_id,
-int index
-)
+int get_device_num_with_vid_pid(libusb_context *ctx,
+                                unsigned int vendor_id,
+                                unsigned int product_id)
 {
-    libusb_device **devs;
+	libusb_device **devs;
 	ssize_t cnt;
 	libusb_device *dev;
-	libusb_device *dev_arr[100];
 	int i=0,j=0,count=0;
 	libusb_device_handle *dev_handle;
-	
 	cnt = libusb_get_device_list(NULL,&devs);
-	if(cnt < 0)
-	{
-	     printf("get device list failed\n");
-             return NULL;
+	if(cnt < 0) {
+		printf("get device list failed\n");
+		return 0;
 	}
-	while(((dev = devs[i++]) != NULL)&&(count < 100))
-	{
-	     
-	       struct libusb_device_descriptor desc; 
-		   int r = libusb_get_device_descriptor(dev,&desc);
-		   if(r < 0)
-		   {
-				fprintf(stderr,"failed to get device descriptor\r\n");
-		        return NULL;
-		   }
-		   if((desc.idVendor == vendor_id)&&(desc.idProduct == product_id))
-	       {  
-				dev_arr[count] = dev;
-				count++;
-				//printf("devarr[%d] device =%d port_num=%d \r\n",count-1,libusb_get_device_address(dev),libusb_get_port_number(dev));
-		   }
-    }
-	libusb_free_device_list(devs, 1);
+	while(((dev = devs[i++]) != NULL)&&(count < MAX_DEV)) {
 
-	if(count == 0)
-	{
-            printf("count =0\n");
-	    return NULL;
+		struct libusb_device_descriptor desc;
+		int r = libusb_get_device_descriptor(dev,&desc);
+		if(r < 0) {
+			fprintf(stderr,"failed to get device descriptor\r\n");
+			return 0;
+		}
+		if((desc.idVendor == vendor_id)&&(desc.idProduct == product_id)) {
+			MSG_DEBUG(" (bus %d, device %d)\n",libusb_get_bus_number(dev), libusb_get_device_address(dev));
+			dev_arr[count] = dev;
+			count++;
+		}
 	}
-    
+	libusb_free_device_list(devs, 1);
+	if(count == 0) {
+		printf("Device not found\n");
+		return 0;
+	}
+	MSG_DEBUG("get count=%d\n",count);
 	sort_dev_array(dev_arr,count);
-	
-    if(index > count)
-    {
-    	printf("index > count");
-        return NULL;
-    }
-	printf("usb port is ");
+	for(j=0; j<count; j++) {
+		MSG_DEBUG(" (bus %d, device %d)\n",libusb_get_bus_number(dev_arr[j]), libusb_get_device_address(dev_arr[j]));
+	}
+	return count;
+}
+libusb_device_handle * libusb_open_device_with_vid_pid_index
+(
+    libusb_context *ctx,
+    unsigned int vendor_id,
+    unsigned int product_id,
+    int index
+)
+{
+	libusb_device **devs;
+	ssize_t cnt;
+	libusb_device *dev;
+	int i=0,j=0,count=0;
+	libusb_device_handle *dev_handle;
+
+	if(index > dev_count) {
+		printf("index > count");
+		return NULL;
+	}
+	MSG_DEBUG("usb port is ");
 	print_port_numbers(dev_arr[index-1]);
-    printf("\r\n");
-    int r;
+	MSG_DEBUG("\r\n");
+	int r;
 	r = libusb_open(dev_arr[index-1],&dev_handle);
-    if(r !=  0 )
-    {
-	     printf("r = %d\r\n",r);
-         return NULL;
-    }
-    else
-    {
-	     return dev_handle;
-    }
-	return NULL;
+	if(r !=  0 ) {
+		MSG_DEBUG("r = %d\r\n",r);
+		return NULL;
+	} else {
+		return dev_handle;
+	}
 }
 int NUC_OpenUsb(void)
 {
 	int ret=0;
-	//libusb_device_handle * handle2=NULL;
-	int index = csg_usb_index;
-
 	if(handle!=NULL) return 0;
 	//Open Device with VendorID and ProductID
-	//handle = libusb_open_device_with_vid_pid(ctx,
-	//         USB_VENDOR_ID, USB_PRODUCT_ID);
 	handle = libusb_open_device_with_vid_pid_index(ctx,
-	         USB_VENDOR_ID, USB_PRODUCT_ID,index);
+	         USB_VENDOR_ID, USB_PRODUCT_ID,csg_usb_index);
 	if (!handle) {
-		perror("device not found");
+		perror("device not found\n");
 		ret=-1;
 		libusb_exit(NULL);
 		return -1;

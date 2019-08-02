@@ -45,7 +45,7 @@
 
 #define RUN_ON_XUSB 0x08FF0001
 
-#if 0
+#if 0c
 #define MSG_DEBUG	printf
 #else
 #define MSG_DEBUG(...)
@@ -62,6 +62,7 @@ extern void NUC_CloseUsb(void);
 extern int NUC_SetType(int id,int type);
 extern int NUC_ReadPipe(int id,unsigned char *buf,int len);
 extern int NUC_WritePipe(int id,unsigned char *buf,int len);
+extern int get_device_num_with_vid_pid(libusb_context *ctx,unsigned int vendor_id,unsigned int product_id);
 
 /* device.c */
 extern int XUSBtoDevice(unsigned char *buf,unsigned int len);
@@ -104,5 +105,8 @@ libusb_context *ctx;
 libusb_device_handle *handle;
 
 unsigned int csg_usb_index;
+#define MAX_DEV 8
+libusb_device *dev_arr[MAX_DEV];
+unsigned int dev_count;
 
 #endif
