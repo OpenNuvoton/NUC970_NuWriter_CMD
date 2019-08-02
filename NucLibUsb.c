@@ -136,9 +136,9 @@ void print_port_numbers(libusb_device *dev)
 	int i;
 	port_numbers_len = libusb_get_port_numbers(dev,port_numbers,sizeof(port_numbers));
 	if(port_numbers_len > 0) {
-		printf(" %d", port_numbers[0]);
+		MSG_DEBUG(" %d", port_numbers[0]);
 		for (i = 1; i <port_numbers_len; i++)
-			printf(".%d", port_numbers[i]);
+			MSG_DEBUG(".%d", port_numbers[i]);
 	}
 }
 
@@ -172,7 +172,6 @@ int get_device_num_with_vid_pid(libusb_context *ctx,
 	}
 	libusb_free_device_list(devs, 1);
 	if(count == 0) {
-		printf("Device not found\n");
 		return 0;
 	}
 	MSG_DEBUG("get count=%d\n",count);

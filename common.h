@@ -45,7 +45,7 @@
 
 #define RUN_ON_XUSB 0x08FF0001
 
-#if 0c
+#if 0
 #define MSG_DEBUG	printf
 #else
 #define MSG_DEBUG(...)

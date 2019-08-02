@@ -314,6 +314,7 @@ int main(int argc, char **argv)
 
 	libusb_init(NULL);
 	if((dev_count=get_device_num_with_vid_pid(ctx,USB_VENDOR_ID, USB_PRODUCT_ID))==0) {
+		printf("Device not found\n");
 		libusb_exit(NULL);
 		return -1;
 	}
