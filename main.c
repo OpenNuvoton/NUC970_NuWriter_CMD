@@ -5,6 +5,31 @@
 #include <dirent.h>
 #include "config.h"
 
+char DDR_fileName[128];
+char write_file[256];
+char read_file[256];
+char Data_Path[256];
+int mode;
+int type;
+unsigned int exe_addr;
+unsigned int dram_run;
+unsigned int erase_read_len;
+int erase_tag;
+int read_tag;
+int write_tag;
+int verify_tag;
+int dtb_tag;
+unsigned int dtb_addr;
+
+struct _INFO_T m_info;
+
+libusb_context *ctx;
+libusb_device_handle *handle;
+
+unsigned int csg_usb_index;
+libusb_device *dev_arr[MAX_DEV];
+unsigned int dev_count;
+
 int check_strlen(const struct dirent *dir)
 {
 	if(strlen(dir->d_name)>5)

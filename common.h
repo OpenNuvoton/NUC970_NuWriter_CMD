@@ -51,6 +51,9 @@
 #define MSG_DEBUG(...)
 #endif
 
+
+#define MAX_DEV 8
+
 /* load_file.c */
 extern char* load_ddr(char *FilePath,int *len);
 extern char * load_xusb(char *FilePath,int *len);
@@ -83,30 +86,29 @@ extern int UXmodem_EMMC(void);
 unsigned int CalculateCRC32(unsigned char * buf,unsigned int len);
 
 /* gloabel */
-char DDR_fileName[128];
-char write_file[256];
-char read_file[256];
-char Data_Path[256];
-int mode;
-int type;
-unsigned int exe_addr;
-unsigned int dram_run;
-unsigned int erase_read_len;
-int erase_tag;
-int read_tag;
-int write_tag;
-int verify_tag;
-int dtb_tag;
-unsigned int dtb_addr;
+extern char DDR_fileName[128];
+extern char write_file[256];
+extern char read_file[256];
+extern char Data_Path[256];
+extern int mode;
+extern int type;
+extern unsigned int exe_addr;
+extern unsigned int dram_run;
+extern unsigned int erase_read_len;
+extern int erase_tag;
+extern int read_tag;
+extern int write_tag;
+extern int verify_tag;
+extern int dtb_tag;
+extern unsigned int dtb_addr;
 
-struct _INFO_T m_info;
+extern struct _INFO_T m_info;
 
-libusb_context *ctx;
-libusb_device_handle *handle;
+extern libusb_context *ctx;
+extern libusb_device_handle *handle;
 
-unsigned int csg_usb_index;
-#define MAX_DEV 8
-libusb_device *dev_arr[MAX_DEV];
-unsigned int dev_count;
+extern unsigned int csg_usb_index;
+extern libusb_device *dev_arr[MAX_DEV];
+extern unsigned int dev_count;
 
 #endif
