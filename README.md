@@ -18,6 +18,12 @@ compiler :
 make
 make install
 ```
+
+udev rule :
+```
+sudo install -Dm644 99-nuc970_isp.rules /etc/udev/rules.d/99-nuc970_isp.rules
+```
+then restart udev service or reboot the system.
 ## NuWriter command tool examples
 
 ## SDRAM mode examples

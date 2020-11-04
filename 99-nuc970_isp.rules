@@ -1,0 +1,5 @@
+# NUC970 USB ISP Device Rule for NuWriter
+
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="0416", ATTRS{idProduct}=="5963", \
+    MODE="660", GROUP="users", SYMLINK+="nuc970isp%n"
+

@@ -119,7 +119,16 @@ int main(int argc, char **argv)
 		*path='\0';
 	}
 #ifndef _WIN32
+    DIR *dir;
+
 	sprintf(Data_Path,"%s%s",Data_Path,"/../share/nudata");
+	dir = opendir(Data_Path);
+	if(dir == NULL) {
+	    sprintf(Data_Path, "/usr/share/nudata"); // switch to system data path
+	}
+	else {
+	    closedir(dir);
+	}
 #else
 	sprintf(Data_Path,"%s%s",Data_Path,"/nudata");
 #endif
@@ -143,7 +152,9 @@ int main(int argc, char **argv)
 
 			fprintf(stderr, "NuWriter [Options] [File/Value]\n\n");
 			fprintf(stderr, "-d [File]      Set DDR initial file\n");
+#if 0
 			fprintf(stderr, "-c [id]        Set device number,default 1\n");
+#endif
 #ifndef _WIN32
 			fprintf(stderr, "-d show        Print supported DDR model\n");
 #endif
@@ -260,10 +271,12 @@ int main(int argc, char **argv)
 			print_using();
 			return 0;
 			break;
+#if 0
 		case 'c':
 
 			csg_usb_index = atoi(argv[optind]);
 			break;
+#endif
 
 		/* Error handle: Mainly missing arg or illegal option */
 		case '?':

@@ -151,36 +151,44 @@ int get_device_num_with_vid_pid(libusb_context *ctx,
 	libusb_device *dev;
 	int i=0,j=0,count=0;
 	libusb_device_handle *dev_handle;
+
 	cnt = libusb_get_device_list(NULL,&devs);
-	if(cnt < 0) {
+	if(cnt <= 0) {
 		printf("get device list failed\n");
 		return 0;
 	}
+
 	while(((dev = devs[i++]) != NULL)&&(count < MAX_DEV)) {
 
 		struct libusb_device_descriptor desc;
 		int r = libusb_get_device_descriptor(dev,&desc);
 		if(r < 0) {
 			fprintf(stderr,"failed to get device descriptor\r\n");
-			return 0;
+	        continue;
 		}
+
 		if((desc.idVendor == vendor_id)&&(desc.idProduct == product_id)) {
 			MSG_DEBUG(" (bus %d, device %d)\n",libusb_get_bus_number(dev), libusb_get_device_address(dev));
 			dev_arr[count] = dev;
 			count++;
 		}
 	}
-	libusb_free_device_list(devs, 1);
+
 	if(count == 0) {
+	    libusb_free_device_list(devs, 1);
 		return 0;
 	}
+
 	MSG_DEBUG("get count=%d\n",count);
 	sort_dev_array(dev_arr,count);
 	for(j=0; j<count; j++) {
 		MSG_DEBUG(" (bus %d, device %d)\n",libusb_get_bus_number(dev_arr[j]), libusb_get_device_address(dev_arr[j]));
 	}
+
+    libusb_free_device_list(devs, 1);
 	return count;
 }
+
 libusb_device_handle * libusb_open_device_with_vid_pid_index
 (
     libusb_context *ctx,
@@ -190,27 +198,53 @@ libusb_device_handle * libusb_open_device_with_vid_pid_index
 )
 {
 	libusb_device **devs;
-	ssize_t cnt;
+	ssize_t i, cnt;
 	libusb_device *dev;
-	int i=0,j=0,count=0;
-	libusb_device_handle *dev_handle;
+	libusb_device_handle *dev_handle = NULL;
+    struct libusb_device_descriptor desc;
+    int r, found;
 
-	if(index > dev_count) {
-		printf("index > count");
-		return NULL;
-	}
-	MSG_DEBUG("usb port is ");
-	print_port_numbers(dev_arr[index-1]);
-	MSG_DEBUG("\r\n");
-	int r;
-	r = libusb_open(dev_arr[index-1],&dev_handle);
-	if(r !=  0 ) {
-		MSG_DEBUG("r = %d\r\n",r);
-		return NULL;
-	} else {
-		return dev_handle;
-	}
+    cnt = libusb_get_device_list(NULL,&devs);
+    if(cnt <= 0) {
+        printf("get device list failed\n");
+        return NULL;
+    }
+
+    found = 0;
+    for(i = 0; i < cnt; i++) {
+        dev = devs[i];
+        r = libusb_get_device_descriptor(dev,&desc);
+        if(r < 0) {
+            fprintf(stderr,"failed to get device descriptor\r\n");
+            continue;
+        }
+
+        if((desc.idVendor == vendor_id)&&(desc.idProduct == product_id)) {
+            MSG_DEBUG(" (bus %d, device %d)\n",libusb_get_bus_number(dev), libusb_get_device_address(dev));
+            found = 1;
+            break;
+        }
+    }
+
+    if(found)
+    {
+#if 0
+        MSG_DEBUG("usb port is ");
+        print_port_numbers(dev);
+        MSG_DEBUG("\r\n");
+#endif
+
+        r = libusb_open(dev, &dev_handle);
+        if(r != 0) {
+            MSG_DEBUG("r = %d\r\n", r);
+            dev_handle = NULL;
+        }
+    }
+
+    libusb_free_device_list(devs, 1);
+	return dev_handle;
 }
+
 int NUC_OpenUsb(void)
 {
 	int ret=0;

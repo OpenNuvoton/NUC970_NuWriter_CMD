@@ -96,6 +96,9 @@ int ParseFlashType(void)
 		MSG_DEBUG("ParseFlashType-EMMC_M\n");
 		if(UXmodem_EMMC()<0) return -1;
 		break;
+	default:
+	    MSG_DEBUG("Unsupported Flash Type!/n");
+	    return -1;
 	}
 
 	return 0;
