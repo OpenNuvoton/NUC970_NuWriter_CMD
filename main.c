@@ -105,32 +105,45 @@ int main(int argc, char **argv)
 	verify_tag = 0;
 	dtb_tag = 0;
 	int cmd_opt = 0;
-	memcpy(Data_Path,argv[0],strlen(argv[0]));
-	path=strrchr(Data_Path,'/');
-	csg_usb_index=1;
-	if(path==NULL) {
-#ifndef _WIN32
-		Data_Path[0]='.';
-		Data_Path[1]='\0';
-#else
-		getcwd(Data_Path, 256);
-#endif
-	} else {
-		*path='\0';
-	}
-#ifndef _WIN32
-    DIR *dir;
+    int n;
 
-	sprintf(Data_Path,"%s%s",Data_Path,"/../share/nudata");
-	dir = opendir(Data_Path);
-	if(dir == NULL) {
-	    sprintf(Data_Path, "/usr/share/nudata"); // switch to system data path
-	}
-	else {
-	    closedir(dir);
-	}
+    csg_usb_index = 1;
+
+#ifndef _WIN32
+
+    n = readlink("/proc/self/exe", Data_Path, sizeof(Data_Path) - 1);
+    if((n < 0) || (n > (sizeof(Data_Path) - 50))) {
+        fprintf(stderr, "Link Error!\n");
+        return -1;
+    }
+
+    Data_Path[n] = '\0';
+    path = strrchr(Data_Path, '/');
+    if(path == NULL) {
+        fprintf(stderr, "Data Path Error!\n");
+        return -2;
+    }
+
+    path[1] = '\0';
+	strcat(Data_Path,"../share/nudata");
 #else
-	sprintf(Data_Path,"%s%s",Data_Path,"/nudata");
+    n = snprintf(Data_Path, sizeof(Data_Path), argv[0]));
+    if(n > (sizeof(Data_Path) - 50)) {
+        fprintf(stderr, "Data Path Too Long!\n");
+        return -2;
+    }
+
+    path=strrchr(Data_Path,'/');
+    if(path == NULL) {
+        if(getcwd(Data_Path, sizeof(Data_Path) - 50)) == NULL) {
+            fprintf(stderr, "Data Path Error!\n");
+            return errno;
+        }
+    } else {
+        *path='\0';
+    }
+
+	strcat(Data_Path, "/nudata");
 #endif
 	//fprintf(stderr,"Data_Path=%s\n",Data_Path);
 	//fprintf(stderr, "argc:%d\n", argc);

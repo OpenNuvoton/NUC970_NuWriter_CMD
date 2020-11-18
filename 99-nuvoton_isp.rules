@@ -1,0 +1,3 @@
+# Nuvoton ISP Device Rule for NuWriter
+
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0416", ATTRS{idProduct}=="5963", MODE="0666"
