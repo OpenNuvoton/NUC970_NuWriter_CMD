@@ -258,22 +258,18 @@ int NUC_OpenUsb(void)
 		libusb_exit(NULL);
 		return -1;
 	}
-#ifdef _WIN32
 	libusb_set_auto_detach_kernel_driver(handle, 1);
 	ret = libusb_claim_interface(handle, 0);
 	if (ret < 0) {
 		fprintf(stderr, "usb_claim_interface error %d\n", ret);
 		return -1;
 	}
-#endif
 	return 0;
 }
 
 void NUC_CloseUsb(void)
 {
-#ifdef _WIN32
 	libusb_release_interface(handle, 0);
-#endif
 	libusb_close(handle);
 	handle=NULL;
 }
